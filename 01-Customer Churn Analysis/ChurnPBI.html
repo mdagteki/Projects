@@ -7554,6 +7554,170 @@ From Get Data link we are going to choose Power BI semantic models</p>
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Exploring-our-data-and-creating-measures">Exploring our data and creating measures<a class="anchor-link" href="#Exploring-our-data-and-creating-measures">¶</a></h2>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>To be able to work comfortably with our data we will convert it to DirectQuery mode and start querying wit DAX Studio.</p>
+<p>EVALUATE
+TOPN(100, 'Databel__Data')</p>
+<p>This DAX formula will return the top 100 customers from our sematic model.</p>
+<p><img alt="Churn25.png" src="images/Churn25.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>First step we are going to create cards showing the total number of customers, churned customers and churn rate.We will create following measures to achieve this.</p>
+<pre><code>        _Number of Customers = 
+            COUNT('Databel__Data'[Customer ID])
+
+        _Churned Customers = 
+            CALCULATE(COUNT(Databel__Data[Churn_Label]), Databel__Data[Churn_Label] = "Yes")
+
+        _Churn Rate = 
+            CALCULATE(DIVIDE([_Churned Customers], [_Number of Customers]))</code></pre>
+<p><strong>The total of 1796 customers, which is 26.9 % of total customers, have churned.</strong> As next step we will check the details of churn reasons by creating a bar chart and use the Number of Customers measure. We will use the % of GT in number of customers to show the percentage of customers for each churn reason, we will set the chart filter for churned field to yes.
+As we can see in the chart the major 3 reason for customer churn are <em><strong>"Competitor Made a Better Offer", "Competitor Had Better Devices", and "Atitude of Support Person".</strong></em> This 3 reason consists of almost 45% of customer churn.</p>
+<p>We will add two donut chats to see the details of Customer by Churn Category and Product Type.
+The main reason behind the churn is <em><strong>"Competitor"</strong></em>, then <em><strong>"Attitude"</strong></em> comes next with 15.98%.
+And the majority of churned customers (87.92 %) has <em><strong>"Month-to-month"</strong></em> contract type.
+We will name our page as <em><strong>Churn Overview</strong></em>.</p>
+<p><img alt="Churn26.png" src="images/Churn26.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>In second page we are going to analyze <em><strong>"Churn Demographics"</strong></em>
+First we are going to bin the ages into groups of 10 years, then we are going to create a stacked column chart which shows the distribution of churn rate by age groups.
+As we see in the chart the majority of churned customers by % to total group are between <em><strong>50-80</strong></em> age range.
+Then We will create a waterfall chart to show the churned customers by age group and the churn category.
+When we check the churn category by age we see that the churn rate in all categories are similar to each other.
+Also we will create another waterfall chart to show the churned customers by age group and gender.
+When we check the churn category by age and gender we see that the churn rate in all categories there is no significant difference.</p>
+<p><img alt="Churn27.png" src="images/Churn27.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>On our third page we are going to analyze <em><strong>"Account and Payment Types"</strong></em>.
+We are going to create following measures and columns:</p>
+<pre><code>        _Demographics = 
+            IF('Databel__Data'[Age] &gt;= 65, "Senior", IF('Databel__Data'[Age] &lt; 30, "Young", "Adult"))
+
+        _Consumption Group = 
+            IF('Databel__Data'[Avg_Monthly_GB_Download] &lt; 5, "Less than 5 GB", IF('Databel__Data'[Avg_Monthly_GB_Download] &gt;= 10, "10 or more GB","Between 5 and 10 GB"))
+
+        _Avg Extra Data Charges = 
+            DIVIDE(SUM('Databel__Data'[Extra_Data_Charges]),[_Number of Customers])
+
+        _Avg Extra International Charges = 
+            DIVIDE(SUM('Databel__Data'[Extra_International_Charges]),[_Number of Customers])</code></pre>
+<p>Now we are going to create a scatter chart to show the relationship between the Churn Rate and Monthly Charge by Demographics and Account Length. Also we are going to create a hidden tooltip page to show the details of the customers.
+In the scatter chart we can see the relationship between Account Length and Churn Rate.As account length increases the churn rate decreases.
+Also we are going to create a Clustered Bar Chart to show the Churn Rate by  Consumption Group and Unlimited Data Plan.
+In the chart we can see that the churn rate is higher in unlimited data plans.
+Then we are going to create a Clustered Bar Chart to show the Churn Rate by Account Length Groups and Contract Groups.
+The churn rate is very high in monthly contract type.</p>
+<p><img alt="Churn28.png" src="images/Churn28.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>The next section is Churn Geography, we will analyze geographical distribution of churned customers.
+We will cerate a clustered column chart, a table and a decomposition tree to see the details of the churned customers by states, also we are going to create a tooltip page to show the details of the customers.</p>
+<p><img alt="Churn30.png" src="images/Churn30.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>In the final section we will make some predictive and prescriptive analysis.
+First we are going to create field parameters to be able to easily change the values on our stacked column chart to see the churn probability between different conditions.
+We are going to name our filed parameters as Churn Factors.</p>
+<pre><code>        Churn Factors = {
+                        ("Age Group", NAMEOF('Databel__Data'[_Age Groups]), 0),
+                        ("Consumption Group", NAMEOF('Databel__Data'[_Consumption Group]), 1),
+                        ("Demographics", NAMEOF('Databel__Data'[_Demographics]), 2),
+                        ("Contract Type", NAMEOF('Databel__Data'[Contract_Type (groups)]), 4),
+                        ("Gender", NAMEOF('Databel__Data'[Gender]), 5),
+                        ("Customer Service Calls", NAMEOF('Databel__Data'[Customer_Service_Calls]), 6)
+                    }</code></pre>
+<p>Then we will create some card visuals along with clustered line chart and then we will add the field parameters as a slicer to the page and chart.</p>
+<p><img alt="Churn29.png" src="images/Churn29.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Recommendations">Recommendations<a class="anchor-link" href="#Recommendations">¶</a></h2><p>To address the issue of customer churn and foster customer loyalty, we suggest the following approaches:</p>
+<p>1 - <em><strong>Competitor Strategy:</strong></em> The company needs to devise a plan to outperform its competitors. This could be achieved by developing devices that cater to the needs of customers, thereby encouraging them to remain with the company.</p>
+<p>2 - <em><strong>Regional Focus:</strong></em> Given that California (CA) has the highest churn rate, it is crucial to pay special attention to the operations in this region.</p>
+<p>3 - <em><strong>Age-Specific Products:</strong></em> Our analysis indicates that the majority of the churn rate is from customers aged 60 and above. Therefore, it would be beneficial to design a product specifically tailored to this age group.</p>
+<p>4 - <em><strong>Proactive Customer Support:</strong></em> Implementing a proactive customer support system that can identify and resolve potential issues before they lead to customer churn is recommended.</p>
+<p>5 - <em><strong>Marketing Strategy:</strong></em> It is important to consider a marketing strategy that not only retains existing customers but also re-engages those who have left.
+Competitive Pricing: To stay competitive, it may be necessary to reconsider the pricing of data services.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>No we will deploy our Power BI desktop report to Power BI service workspace. Our report is ready to share.</p>
+</div>
+</div>
+</div>
+</div>
 </main>
 </body>
 </html>
